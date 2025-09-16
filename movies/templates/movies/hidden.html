@@ -5,7 +5,7 @@
     <div class="container">
         <div class="row mt-3">
             <div class="col mx-auto mb-3">
-                <h2>List of Movies</h2>
+                <h2>Hidden Movies</h2>
                 <hr />
                 <p class="card-text"></p>
                     <form method="GET">
@@ -19,13 +19,12 @@
                             <div class="col-auto">
                                 <button class="btn bg-dark text-white" type="submit">Search</button>
                             </div>
-                            <div class="col-auto">
-                                <a href="{% url 'movies.hidden' %}" class="btn btn-outline-secondary">View Hidden Movies</a>
-                            </div>
                         </div>
                     </form>
                 </p>
-
+                <div class="mb-3">
+                    <a href="{% url 'movies.index' %}" class="btn btn-secondary">Back to Movies</a>
+                </div>
             </div>
         </div>
         <div class="row">
@@ -43,11 +42,15 @@
                         <p class="card-text">${{ movie.price }}</p>
                         <p class="card-text">{{ movie.description }}</p>
                         {% if user.is_authenticated %}
-                        <a href="{% url 'movies.hide' id=movie.id %}"
-                           class="btn btn-warning btn-sm">Hide</a>
+                        <a href="{% url 'movies.unhide' id=movie.id %}"
+                           class="btn btn-success">Unhide</a>
                         {% endif %}
                     </div>
                 </div>
+            </div>
+            {% empty %}
+            <div class="col-12">
+                <p class="text-center">No hidden movies found.</p>
             </div>
             {% endfor %}
         </div>

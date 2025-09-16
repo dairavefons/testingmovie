@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h3 class="mb-0"><i class="fas fa-user me-2"></i>User Profile</h3>
+                </div>
+                <div class="card-body">
+                    {% if user.is_authenticated %}
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            <div class="text-center">
+                                <i class="fas fa-user-circle fa-5x text-secondary mb-3"></i>
+                                <h5>{{ user.username }}</h5>
+                            </div>
+                        </div>
+                        <div class="col-md-8">
+                            <h4 class="mb-3">Personal Information</h4>
+                            <div class="row mb-2">
+                                <div class="col-sm-4"><strong>Username:</strong></div>
+                                <div class="col-sm-8">{{ user.username }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4"><strong>Email:</strong></div>
+                                <div class="col-sm-8">{{ user.email|default:"john.doe@example.com" }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4"><strong>First Name:</strong></div>
+                                <div class="col-sm-8">{{ user.first_name|default:"John" }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4"><strong>Last Name:</strong></div>
+                                <div class="col-sm-8">{{ user.last_name|default:"Doe" }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4"><strong>Member Since:</strong></div>
+                                <div class="col-sm-8">{{ user.date_joined|date:"F d, Y" }}</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-4"><strong>Last Login:</strong></div>
+                                <div class="col-sm-8">{{ user.last_login|date:"F d, Y g:i A"|default:"Never" }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <hr>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <h5 class="mb-3">Account Statistics</h5>
+                            <div class="row mb-2">
+                                <div class="col-sm-6"><strong>Movies Purchased:</strong></div>
+                                <div class="col-sm-6">24</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-6"><strong>Reviews Written:</strong></div>
+                                <div class="col-sm-6">12</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-6"><strong>Total Spent:</strong></div>
+                                <div class="col-sm-6">$189.50</div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <h5 class="mb-3">Preferences</h5>
+                            <div class="row mb-2">
+                                <div class="col-sm-6"><strong>Favorite Genre:</strong></div>
+                                <div class="col-sm-6">Action/Adventure</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-6"><strong>Language:</strong></div>
+                                <div class="col-sm-6">English</div>
+                            </div>
+                            <div class="row mb-2">
+                                <div class="col-sm-6"><strong>Newsletter:</strong></div>
+                                <div class="col-sm-6"><span class="badge bg-success">Subscribed</span></div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="text-center mt-4">
+                        <a href="{% url 'accounts.orders' %}" class="btn btn-primary me-2">
+                            <i class="fas fa-shopping-bag me-1"></i>View Orders
+                        </a>
+                        <a href="{% url 'movies.index' %}" class="btn btn-secondary">
+                            <i class="fas fa-film me-1"></i>Browse Movies
+                        </a>
+                    </div>
+                    {% else %}
+                    <div class="text-center">
+                        <h4>Please log in to view your profile</h4>
+                        <a href="{% url 'accounts.login' %}" class="btn btn-primary">Login</a>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock content %}

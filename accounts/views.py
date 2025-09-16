@@ -47,7 +47,3 @@ def orders(request):
     template_data['orders'] = request.user.order_set.all()
     return render(request, 'accounts/orders.html', {'template_data': template_data})
 
-def profile(request):
-    template_data = {}
-    template_data['title'] = 'Profile'
-    return render(request, 'accounts/profile.html', {'template_data': template_data})

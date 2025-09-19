@@ -9,6 +9,7 @@
                 <hr />
                 <p class="card-text"></p>
                     <form method="GET">
+                        {% csrf_token %}
                         <div class="row">
                             <div class="col-auto">
                                 <div class="input-group col-auto">
@@ -21,6 +22,9 @@
                             </div>
                             <div class="col-auto">
                                 <a href="{% url 'movies.hidden' %}" class="btn btn-outline-secondary">View Hidden Movies</a>
+                            </div>
+                            <div class="col-auto">
+                                <a href="{% url 'movies.petition' %}" class="btn btn-outline-primary">Movie Petition</a>
                             </div>
                         </div>
                     </form>
@@ -43,8 +47,23 @@
                         <p class="card-text">${{ movie.price }}</p>
                         <p class="card-text">{{ movie.description }}</p>
                         {% if user.is_authenticated %}
-                        <a href="{% url 'movies.hide' id=movie.id %}"
-                           class="btn btn-warning btn-sm">Hide</a>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <button class="btn btn-outline-danger btn-sm like-btn"
+                                    data-movie-id="{{ movie.id }}"
+                                    data-liked="{{ movie.user_liked|yesno:'true,false' }}">
+                                <span class="like-icon">{% if movie.user_liked %}❤️{% else %}🤍{% endif %}</span>
+                                <span class="like-count">{{ movie.like_count }}</span>
+                            </button>
+                            <a href="{% url 'movies.hide' id=movie.id %}"
+                               class="btn btn-warning btn-sm">Hide</a>
+                        </div>
+                        {% else %}
+                        <div class="d-flex justify-content-center">
+                            <span class="text-muted">
+                                <span>🤍</span>
+                                <span>{{ movie.like_count }}</span>
+                            </span>
+                        </div>
                         {% endif %}
                     </div>
                 </div>
@@ -53,4 +72,78 @@
         </div>
     </div>
 </div>
+
+<script>
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+    const likeButtons = document.querySelectorAll('.like-btn');
+    const csrfToken = getCookie('csrftoken') || document.querySelector('[name=csrfmiddlewaretoken]')?.value;
+
+    likeButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+
+            const movieId = this.dataset.movieId;
+            const likeIcon = this.querySelector('.like-icon');
+            const likeCount = this.querySelector('.like-count');
+
+            console.log('Clicking like for movie:', movieId);
+            console.log('CSRF Token:', csrfToken);
+
+            fetch(`/movies/${movieId}/like/`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': csrfToken,
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'same-origin'
+            })
+            .then(response => {
+                console.log('Response status:', response.status);
+                console.log('Response headers:', response.headers);
+                if (!response.ok) {
+                    return response.text().then(text => {
+                        throw new Error(`HTTP error! status: ${response.status}, response: ${text}`);
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                console.log('Like response data:', data);
+                likeIcon.textContent = data.liked ? '❤️' : '🤍';
+                likeCount.textContent = data.like_count;
+                this.dataset.liked = data.liked.toString();
+
+                // Update button appearance
+                if (data.liked) {
+                    this.classList.remove('btn-outline-danger');
+                    this.classList.add('btn-danger');
+                } else {
+                    this.classList.remove('btn-danger');
+                    this.classList.add('btn-outline-danger');
+                }
+            })
+            .catch(error => {
+                console.error('Error liking movie:', error);
+                alert('Error liking movie: ' + error.message);
+            });
+        });
+    });
+});
+</script>
 {% endblock content %}
